@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package DECEL;
+
+// Enumération pour les réponses possibles aux messages
+enum MESSAGE_ANSW_ERROR {
+	OK = 0; // Réponse OK
+	KO = 1; // Réponse KO
+}
+
+// Enumération pour les types de demande GPIO possibles
+enum GPIO_MESSAGE_ASK_TYPE {
+	GET_STATE		= 0; // Demande de l'état actuel du GPIO : 0 = input, 1 = output, -1 = Z
+	SET_STATE_Z 	= 1; // Demande de définir l'état du GPIO à Z
+	SET_STATE_O 	= 2; // Demande de définir l'état du GPIO à O (output)
+	SET_STATE_I		= 3; // Demande de définir l'état du GPIO à I (input)
+	GET_READ_VALUE 	= 4; // Demande de valeur lue par le GPIO, si pas en mode lecture, renvoie -1
+	SET_OUTPUT 		= 5; // Mise a 1 de la sortie
+	CLEAR_OUTPUT 	= 6; // Mise a 0 de la sortie
+}
+
+// Enumération pour les types de réponse GPIO possibles
+enum GPIO_MESSAGE_ANSW_TYPE {
+	VALUE		= 0; // Réponse contenant la valeur actuelle du GPIO
+	DIRECTION 	= 1; // Réponse contenant la direction actuelle du GPIO
+}
+
+// Message pour demander des informations sur le GPIO
+message GPIO_ASK {
+	int32 gpio_id 				= 1; // ID du GPIO, -1 pour tous les GPIO
+	GPIO_MESSAGE_ASK_TYPE type_message 	= 2; // Type de demande GPIO
+}
+
+// Message de réponse contenant des informations sur le GPIO
+message GPIO_ANSW {
+	int32 gpio_id = 1; // ID du GPIO, -1 pour tous les GPIO
+	GPIO_MESSAGE_ANSW_TYPE type_message = 2; // Type de réponse GPIO
+	optional uint32 value = 3; // Valeur (optionnelle) associée à la réponse
+}
+
+// Enumération pour les types de message MCP4922 possibles
+enum MCP4922_message_type {
+    SET_VALUE_MCP4922 = 0; // Demande de définir la valeur du MCP4922
+    SHUTDOWN_MCP4922 = 1; // Demande de mise hors tension du MCP4922
+}
+
+// Message pour demander des informations sur le MCP4922
+message MCP4922_ASK {
+    uint32 MCP4922_id = 1; // ID du MCP4922
+    uint32 DAC_Chanel = 2; // Canal DAC du MCP4922
+    MCP4922_message_type type = 3; // Type de demande MCP4922
+    optional uint32 value = 4; // Valeur (optionnelle) associée à la demande
+}
+
+// Enumération pour les types de message MCP41010 possibles
+enum MCP41010_message_type {
+    SET_VALUE_MCP41010 = 0; // Demande de définir la valeur du MCP41010
+    SHUTDOWN_MCP41010 = 1; // Demande de mise hors tension du MCP41010
+}
+
+// Message pour demander des informations sur le MCP41010
+message MCP41010_ASK {
+    uint32 MCP41010_id = 1; // ID du MCP41010
+    MCP41010_message_type type = 3; // Type de demande MCP41010
+    optional uint32 value = 4; // Valeur (optionnelle) associée à la demande
+}
+
+// Message pour représenter une entrée analogique lue
+message ANALOG_IN {
+    uint32 ANALOG_IN_id = 1; // ID de l'entrée analogique
+    uint32 value = 2; // Valeur lue
+}
+
+// Message global pour les demandes dans l'application DECEL
+message DECEL_ASK {
+    uint32 message_id                   = 1;
+	oneof msg {
+		GPIO_ASK gpio_ask               = 2; // Demande GPIO
+        MCP4922_ASK mcp4922_ask         = 3; // Demande MCP4922
+        MCP41010_ASK mcp41010_ask       = 4; // Demande MCP41010
+	}
+}
+
+// Message global pour les données en réponse aux demandes dans l'application DECEL
+message DECEL_ANSW {
+    uint32 message_id                   = 1;
+	oneof msg {
+		GPIO_ANSW gpio_data             = 2; // Réponse GPIO
+        ANALOG_IN analog_in_data        = 3; // Données d'entrée analogique
+	}
+}
+
+// Message for acknowledging the reception of a message
+message ACK {
+    int32 message_id = 1; // The ID of the message being acknowledged
+    MESSAGE_ANSW_ERROR status = 2; // The status of the processing (OK or KO)
+}
+

@@ -1,0 +1,56 @@
+int main()
+{
+    printf("Receive  kkk\n");
+
+    DECEL_GPIO_ANSW test;
+
+
+    test.error = DECEL_MESSAGE_ANSW_ERROR_KO;
+    test.has_value = true;
+    test.value = 5;
+    DECEL_GPIO_ASK message;
+    pb_byte_t  buffer_test[DECEL_GPIO_ANSW_size];
+    pb_byte_t  buffer_test2[DECEL_GPIO_ANSW_size];
+
+    pb_ostream_t stream = pb_ostream_from_buffer(buffer_test, sizeof(buffer_test));
+    pb_encode(&stream, DECEL_GPIO_ANSW_fields, &test);
+
+    pb_istream_t stream2 = pb_istream_from_buffer(buffer_test, DECEL_GPIO_ANSW_size);
+        
+        /* Now we are ready to decode the message. */
+    pb_decode(&stream2, DECEL_GPIO_ANSW_fields, &message);
+
+    // Create a BufferedSerial object on pins D1 and D0 with a baud rate of 115200
+    BufferedSerial serial(PC_10, PC_11, 115200);
+
+    // Define a buffer to hold the received data
+    pb_byte_t buffer[256] = {0};
+
+    // Define a variable to keep track of the buffer position
+    int buffer_pos = 0;
+    
+    // Read data from the serial port until a newline character is received
+    while (true) {
+        // Read one byte from the serial port
+        char c;
+        int n = serial.read(&c, 1);
+
+        // If we received a byte, add it to the buffer
+        if (n > 0) {
+            
+            buffer[buffer_pos++] = c;
+            // If we received a newline character, print the buffer and reset the buffer position
+            if (c == '\n') {
+
+                printf("Received: %s\n", buffer);
+                stream2 = pb_istream_from_buffer(buffer, DECEL_GPIO_ANSW_size);
+                pb_decode(&stream2, DECEL_GPIO_ASK_fields, &message);
+
+
+
+                memset(buffer, 0, sizeof(buffer));
+                buffer_pos = 0;
+            }
+        }
+    }
+}
