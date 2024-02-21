@@ -117,12 +117,12 @@ void DecelGPIO<T>::handle_decel_msg(const DECEL_DECEL_ASK message) {
       break;
     case (DECEL_GPIO_MESSAGE_ASK_TYPE_SET_STATE_O):
       // set GPIO pin to output
-      //printf("set output %d\n", id);
+     // printf("set as output %d\n", id);
       setOutput(id);
       break;
     case (DECEL_GPIO_MESSAGE_ASK_TYPE_SET_STATE_I):
       // set GPIO pin to input
-         //   printf("set input %d\n", id);
+    //printf("set as input %d\n", id);
 
       setInput(id);
       break;
@@ -142,7 +142,7 @@ void DecelGPIO<T>::handle_decel_msg(const DECEL_DECEL_ASK message) {
       break;
     case (DECEL_GPIO_MESSAGE_ASK_TYPE_OUTPUT_SET):
       // set GPIO pin value to 1
-      printf("set output %d\n", id);
+     // printf("set output %d\n", id);
       setValue(id, 1);
       break;
     case (DECEL_GPIO_MESSAGE_ASK_TYPE_OUTPUT_CLEAR):

@@ -6,7 +6,7 @@ void Decel::_sbc_serial_reader() {
 
   MbedCRC<POLY_8BIT_CCITT, 8> ct;
 
-  constexpr size_t MAX_BUFFER_SIZE = (DECEL_DECEL_ASK_size + 5) * 4 ;
+  constexpr size_t MAX_BUFFER_SIZE = (DECEL_DECEL_ASK_size + 5) * 6 ;
   std::array<uint8_t, MAX_BUFFER_SIZE> buffer_;
   size_t buffer_length = 0;
   printf("atfer \n");
@@ -72,22 +72,28 @@ void Decel::_sbc_serial_reader() {
           // Handle message based on type
           switch (message.which_msg) {
           case (DECEL_DECEL_ASK_gpio_ask_tag):
-            printf("GPIO message received\n");
+            //printf("GPIO message received\n");
             decel_incoming_queue.call(
-                &_decelGPIO, &DecelGPIO<16>::handle_decel_msg, message);
+                &_decelGPIO, &DecelGPIO<GPIO_SIZE>::handle_decel_msg, message);
             break;
           case (DECEL_DECEL_ASK_mcp4922_ask_tag):
-            printf("MCP4922 message received\n");
+            //printf("MCP4922 message received\n");
             decel_incoming_queue.call(
                 &_decelMCP4922, &DecelMCP4922<2>::handle_decel_msg, message);
             break;
           case (DECEL_DECEL_ASK_mcp41010_ask_tag):
-            printf("MCP41010 message received\n");
+           // printf("MCP41010 message received\n");
             decel_incoming_queue.call(
                 &_decelMCP41010, &DecelMCP41010::handle_decel_msg, message);
             break;
+        case (DECEL_DECEL_ASK_analog_in_ask_tag):
+            //printf("Analog IN message received\n");
+            decel_incoming_queue.call(
+                &_decelAnalogIn, &DecelAnalogIn<ANALOG_IN_SIZE>::handle_decel_msg, message);
+            break;
 
           }
+          
         }
         // Remove processed message from buffer
         std::move(buffer_.begin() + end_idx + 1,

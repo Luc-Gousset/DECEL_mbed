@@ -38,11 +38,9 @@ void DecelMCP4922<T>::handle_decel_msg(const DECEL_DECEL_ASK message) {
                                         : MCP4922::DAC_B;
     switch (message.msg.mcp4922_ask.type) {
     case (DECEL_MCP4922_message_type_SET_VALUE_MCP4922):
-#ifdef _DEBUG
-      printf("set mcp value : %d", message.msg.mcp4922_ask.value);
-#endif
-      // printf("set mcp value : %d %d %d", message.msg.mcp4922_ask.value,
-      // mcp_id , message.msg.mcp4922_ask.DAC_Chanel);
+
+      printf("set mcp value : %d %d %d", message.msg.mcp4922_ask.value,
+      mcp_id , message.msg.mcp4922_ask.DAC_Chanel);
 
       if (mcpArray[mcp_id].powerMode(selected_dac) == MCP4922::POWER_SHUTDOWN) {
         mcpArray[mcp_id].powerMode(selected_dac, MCP4922::POWER_NORMAL);

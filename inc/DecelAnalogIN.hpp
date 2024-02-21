@@ -80,13 +80,17 @@ public:
 template <std::size_t T>
 void DecelAnalogIn<T>::handle_decel_msg(const DECEL_DECEL_ASK message) {
   // check if the incoming message is GPIO-related
-  if (message.which_msg == DECEL_DECEL_ANSW_analog_in_data_tag) {
+  if (message.which_msg == DECEL_DECEL_ASK_analog_in_ask_tag) {
     int id = message.msg.analog_in_ask.ANALOG_IN_id;
     switch (message.msg.analog_in_ask.type) {
+        
     case (DECEL_ANALOG_IN_message_type_DISABLE_ANALOG_IN):
+        //printf("disable analog in %d\n", id);
         analog_array_enable.at(id)=false;
       break;
     case (DECEL_ANALOG_IN_message_type_ENABLE_ANALOG_IN):
+        //printf("enavle analog in %d\n", id);
+
         analog_array_enable.at(id)=true;
       break;
     }
@@ -103,13 +107,15 @@ template <std::size_t T> std::array<uint16_t, T> DecelAnalogIn<T>::getValues() {
         result.at(i) = analog_array.at(i).read_u16();
     else 
         result.at(i) = 0;
+    //printf("READ ANALOG, %d %d\n", i, result.at(i));
+
 
   }
 
   return result;
 }
 template <std::size_t T> void DecelAnalogIn<T>::cycle() {
-    printf("AnalogIn cycle\n");
+    //printf("Cycle\n");
   std::array<uint16_t, T> current_value = getValues();
 
   std::array<uint8_t, DECEL_DECEL_ANSW_size> buffer_output = {0};
@@ -124,6 +130,7 @@ template <std::size_t T> void DecelAnalogIn<T>::cycle() {
     for (int i = 0; i < T; i++) {
       if (current_value.at(i) != -1 &&
           current_value.at(i) != last_value.at(i)) {
+        //printf("AnalogIn id %d value %d \n", i, current_value.at(i));
         answ.msg.analog_in_data.ANALOG_IN_id = i;
         answ.msg.analog_in_data.value = current_value.at(i);
 

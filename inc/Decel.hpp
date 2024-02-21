@@ -27,13 +27,13 @@ private:
   // Composants
   DecelSerialCom &serial_com;
 
-  DecelGPIO<16> &_decelGPIO;
+  DecelGPIO<GPIO_SIZE> &_decelGPIO;
 
   DecelMCP4922<2> &_decelMCP4922;
 
   DecelMCP41010 &_decelMCP41010;
 
-  DecelAnalogIn<4> &_decelAnalogIn;
+  DecelAnalogIn<ANALOG_IN_SIZE> &_decelAnalogIn;
 
   void _sbc_serial_reader();
 
@@ -49,13 +49,13 @@ public:
   Decel(Mutex &crc_mutex, BufferedSerial &sbc_serial, SPI &decelSPI,
         MCP41010 &mcp41010, DecelSerialCom &serial_com,
 
-        DecelGPIO<16> &_decelGPIO,
+        DecelGPIO<GPIO_SIZE> &_decelGPIO,
 
         DecelMCP4922<2> &_decelMCP4922,
 
         DecelMCP41010 &_decelMCP41010,
 
-        DecelAnalogIn<4> &_decelAnalogIn)
+        DecelAnalogIn<ANALOG_IN_SIZE> &_decelAnalogIn)
       : sbc_serial(sbc_serial), crc_mutex(crc_mutex), decelSPI(decelSPI),
         mcp41010(mcp41010), serial_com(serial_com), _decelGPIO(_decelGPIO),
         _decelMCP4922(_decelMCP4922), _decelMCP41010(_decelMCP41010),
@@ -67,17 +67,15 @@ public:
         callback(&decel_incoming_queue, &EventQueue::dispatch_forever));
 
     decel_incoming_queue.call_every(GPIO_POOLING_MS, &_decelGPIO,
-                                    &DecelGPIO<16>::cycle);
+                                    &DecelGPIO<GPIO_SIZE>::cycle);
     decel_incoming_queue.call_every(ANALOG_IN_POOLING_MS, &_decelAnalogIn,
-     &DecelAnalogIn<4>::cycle);
+     &DecelAnalogIn<ANALOG_IN_SIZE>::cycle);
 
-    printf("   a\n");
     DigitalOut latch(PB_2);
     DigitalOut shutdown(PC_1);
     shutdown = 1;
     DigitalOut shutdown2(PC_0);
     shutdown2 = 1;
-    printf("   b\n");
 
     latch = 0;
     // init spi

@@ -1,7 +1,7 @@
 #include "DecelSerialCom.hpp"
 
   void DecelSerialCom::send_to_serial(const std::array<uint8_t, DECEL_DECEL_ANSW_size> data_to_send , std::size_t size) {
-      printf("send\n");
+      //printf("send\n");
       serial_mutex.lock();
     uint32_t  crc;
 
